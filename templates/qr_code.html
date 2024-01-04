@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic QR Code</title>
+</head>
+<body>
+    <h1>Dynamic QR Code</h1>
+    <img src="{{ url_for('static', filename='dynamic_qr_code.png') }}" alt="Dynamic QR Code">
+
+    
+    <!-- Add a hidden input field with the value of location -->
+    <input type="hidden" id="location" name="location" value="{{ location }}">
+    
+    <!-- Add a hidden input field with the value of url -->
+    <input type="hidden" id="next_url" name="next_url" value="{{ next_url }}">
+
+
+
+    <script>
+        // Function to check the value at location in Firebase Realtime Database
+        async function checkFirebaseValue() {
+            // Get the location value from the hidden input field
+            const location = document.getElementById('location').value;
+            const next_url = document.getElementById('next_url').value;
+
+            // Fetch the value from Firebase Realtime Database
+            const response = await fetch(`/check_value?location=${location}`);
+            const data = await response.json();
+
+            // Check the value and redirect accordingly
+            if (data.value === 1) {
+                // Show a popup notification after the redirect
+                alert('Redirecting to a particular URL. Check your destination!');
+                // Redirect to a particular URL
+                window.location.href = next_url;
+            } else {
+                // Show a popup notification after the redirect
+                alert('Verification has Failed!');
+                // Redirect back to /qr_code
+                window.location.href = '/qr_code';
+            }
+        }
+
+        // Call the function when the page loads
+        checkFirebaseValue();
+    </script>
+</body>
+</html>
