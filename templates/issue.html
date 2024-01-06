@@ -1,0 +1,30 @@
+<!-- issue.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container mt-4">
+        <form method="post" action="{{ url_for('issue') }}">
+            <h2>Issue</h2>
+            <label for="receiver_id">Receiver ID:</label>
+            <input type="text" id="receiver_id" name="receiver_id" required>
+
+            <input type="submit" value="Submit Issue">
+        </form>
+    </div>
+
+    <script>
+        function toggleNavbar() {
+            document.body.classList.toggle('navbar-active');
+        }
+    </script>
+</body>
+</html>

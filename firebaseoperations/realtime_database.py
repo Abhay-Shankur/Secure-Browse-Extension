@@ -1,19 +1,9 @@
-import time
-import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import db
 
 
-class FirebaseOperations:
+class RealtimeDatabaseListener():
     def __init__(self):
-        # Initialize Firebase with your service account key
-        self.cred = credentials.Certificate("serviceAccountKey.json")
-        firebase_admin.initialize_app(self.cred,
-                                      {'databaseURL': 'https://detect-f07fd-default-rtdb.firebaseio.com'})
-
-
-class RealtimeDatabaseListener(FirebaseOperations):
-    def __init__(self):
-        super().__init__()
+        # super().__init__()
         self.updated_value = None
 
     def callback(self, event):
@@ -31,7 +21,7 @@ class RealtimeDatabaseListener(FirebaseOperations):
         while True:
             if self.updated_value != -1:
                 return self.updated_value
-        return None
+        return
 
     def remove_location(self, location):
         ref = db.reference(location)
@@ -41,9 +31,3 @@ class RealtimeDatabaseListener(FirebaseOperations):
     def add_value(self, path, data):
         db.reference(path).update(data)
 
-
-
-# Example usage
-# fbrd = RealtimeDatabaseListener()
-# if fbrd.start_listener('/Tokens/hAoa1FBmFu') != -1:
-#     fbrd.remove_location('/Tokens/hAoa1FBmFu')

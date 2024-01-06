@@ -5,19 +5,24 @@ import random
 import string
 from flask import Flask, render_template, request, jsonify
 
-from firebaseoperations.firebase_operations import RealtimeDatabaseListener
+from firebaseoperations.firebase_operations import FirebaseOperations
+from firebaseoperations.realtime_database import RealtimeDatabaseListener
+from models.admin import Admin
+
+from models.api_handler import ApiHandler
 
 app = Flask(__name__)
-fb_rd = RealtimeDatabaseListener()
-
-# cred = credentials.Certificate("serviceAccountKey.json")
-# firebase_admin.initialize_app(cred, {'databaseURL': 'https://detect-f07fd-default-rtdb.firebaseio.com'})
+# fb = RealtimeDatabaseListener()
+# admin = Admin()
+fb = FirebaseOperations()
+handler = ApiHandler(fb)
 
 # List of protected URLs
 protected_urls = [
     "https://www.youtube.com",
     # Add other URLs as needed
 ]
+
 
 # Function to generate dynamic QR code content
 def generate_qr_code_content():
@@ -32,8 +37,7 @@ def generate_qr_code_content():
     content_json = json.dumps(content_dict)
 
     # Store the token in Firebase Realtime Database
-    fb_rd.add_value(path='/Tokens', data={dynamic_data: -1})
-
+    fb.add_value(path='/Tokens', data={dynamic_data: -1})
 
     # Create QR code
     qr = qrcode.QRCode(
@@ -76,18 +80,53 @@ def qr_code():
     generate_qr_code_content()
     qr_code_content = getattr(app, 'content', None)
     next_url = getattr(app, 'next_url', '')
-    
+
     # Retrieve the latest token from Firebase Realtime Database
-    location = '/Tokens/'+qr_code_content['token']
+    location = '/Tokens/' + qr_code_content['token']
 
     return render_template('qr_code.html', location=location, next_url=next_url)
+
 
 @app.route('/check_value')
 def check_value():
     # Retrieve the location from the query parameters
     location = request.args.get('location')
-    result = fb_rd.start_listener(location=location)
+    result = fb.start_listener(location=location)
     return jsonify({'value': result})
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        pass
+        # sender_id = request.form['sender_id']
+        # data = {
+        #     "aadhar": request.form['adhar_number'],
+        #     "name": request.form['name'],
+        #     "email": request.form['gmail'],
+        #     "role": "User",
+        #     "dob": request.form['dob']
+        # }
+        # handler = Admin()
+        # handler.issue_credentials(subjectDid=sender_id, fields=data)
+    # collections=[fd.get_matching_doc(collection_name=collection) for collection in fd.get_all_collections()]
+    collections = handler.get_status()
+    return render_template('index.html', collections=collections)
+
+
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        pass
+    return render_template('create.html')
+
+
+@app.route('/issue', methods=['GET', 'POST'])
+def issue():
+    if request.method == 'POST':
+        pass
+    return render_template('issue.html')
 
 
 if __name__ == '__main__':

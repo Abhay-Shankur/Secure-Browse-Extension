@@ -1,0 +1,44 @@
+<!-- create.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Employee</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container mt-4">
+
+        <form method="post" action="{{ url_for('create') }}">
+            <h2>Add User Details</h2>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="aadhar">Aadhar Number (12 digits):</label>
+            <input type="text" id="aadhar" name="aadhar" pattern="\d{12}" title="Enter a 12-digit Aadhar number" required>
+
+            <label for="role">Role:</label>
+            <input type="text" id="role" name="role" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <input type="submit" value="Create">
+        </form>
+    </div>
+
+    <script>
+        function toggleNavbar() {
+            document.body.classList.toggle('navbar-active');
+        }
+    </script>
+</body>
+</html>

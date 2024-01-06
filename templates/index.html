@@ -1,0 +1,49 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container mt-4">
+        <div class="card-grid">
+            {% for collection in collections %}
+                <div class="card-row">
+                    <h2 class="card-row-title">{{collection.get('collection','')}}</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Employees</h5>
+                            <p class="card-text">{{collection.get('total','')}}</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Employees</h5>
+                            <p class="card-text">{{collection.get('total-active','')}}</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">On Leave</h5>
+                            <p class="card-text">{{collection.get('total-onleave','')}}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+
+    <script>
+        function toggleNavbar() {
+            document.body.classList.toggle('navbar-active');
+        }
+    </script>
+</body>
+</html>

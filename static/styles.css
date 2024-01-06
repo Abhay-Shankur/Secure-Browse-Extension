@@ -1,0 +1,181 @@
+/* styles.css */
+
+body {
+    font-family: cursive;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-toggle {
+    display: none; /* Hide the navbar toggle button by default */
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: #fff;
+    cursor: pointer;
+}
+
+.nav {
+    list-style: none;
+    display: flex;
+}
+
+.nav-item {
+    margin-right: 10px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #2980b9;
+}
+
+.navbar-brand {
+    font-size: xx-large;
+    font-family: fantasy;
+}
+/* Responsive styles */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-toggle {
+        display: block; /* Show the navbar toggle button on small screens */
+    }
+
+    .nav {
+        display: none; /* Hide the nav links by default on small screens */
+        flex-direction: column;
+        width: 100%;
+        text-align: left;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #3498db;
+    }
+
+    .nav.active {
+        display: flex; /* Show the nav links when the sidebar is active */
+    }
+
+    .nav-item {
+        margin: 0;
+    }
+
+    .navbar-brand {
+        order: -1; /* Move the brand to the left in the column layout */
+    }
+}
+
+
+
+.container {
+    margin-top: 50px;
+}
+
+.card-grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns in the grid */
+    gap: 20px; /* Space between cards */
+    margin: 10px 30px;
+}
+
+/* Media query for larger screens */
+@media (min-width: 768px) {
+    .card-grid {
+        max-width: 70%; /* Set maximum width for the card grid on larger screens */
+        gap: 40px;
+        margin: 0 auto; /* Center the card grid */
+    }
+}
+
+.card-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.card-row-title{
+    width: 100%;
+    font-weight: 900;
+    border-bottom: 2px solid black;
+    padding-right: 10px;
+}
+
+.card {
+    width: 200px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-body {
+    text-align: center;
+    padding: 10px;
+}
+
+.card-title {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1.2em;
+    color: #3498db;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 456px;
+    margin: auto;
+}
+
+label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
