@@ -1,27 +1,28 @@
+import threading
+
 from firebase_admin import db
 
 
-class RealtimeDatabaseListener():
+class RealtimeDatabaseListener:
     def __init__(self):
-        # super().__init__()
         self.updated_value = None
 
     def callback(self, event):
-        if event.event_type == 'put' and event.data != -1:
-            # Value updated
-            # updated_value = /
+        if event.event_type == 'put':
             self.updated_value = event.data
-            # print(f"Value at location {event.path} updated to: {self.updated_value}")
             return
 
     def start_listener(self, location):
         ref = db.reference(location)
-        self.updated_value = ref.get()
-        ref.listen(self.callback)
+        self.updated_value = dict(ref.get())
+
+        # Wait for an update with a child named "result"
         while True:
-            if self.updated_value != -1:
+            ref.listen(self.callback)
+            if "verified" in self.updated_value.keys():
                 return self.updated_value
         return
+
 
     def remove_location(self, location):
         ref = db.reference(location)

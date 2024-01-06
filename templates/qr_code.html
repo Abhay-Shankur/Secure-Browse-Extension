@@ -30,7 +30,7 @@
             const data = await response.json();
 
             // Check the value and redirect accordingly
-            if (data.value === 1) {
+            if (data.verified) {
                 // Show a popup notification after the redirect
                 alert('Redirecting to a particular URL. Check your destination!');
                 // Redirect to a particular URL
@@ -41,6 +41,8 @@
                 // Redirect back to /qr_code
                 window.location.href = '/qr_code';
             }
+            // Show a popup notification after the redirect
+            alert('Verification has Failed!');
         }
 
         // Call the function when the page loads

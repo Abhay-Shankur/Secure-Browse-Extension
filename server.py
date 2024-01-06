@@ -32,12 +32,13 @@ def generate_qr_code_content():
     # JSON content for the QR code
     content_dict = {
         "type": ["VerifiableCredential", "Degree"],
-        "token": dynamic_data
+        "token": dynamic_data,
+        "next_url": getattr(app, 'next_url', ''),
     }
     content_json = json.dumps(content_dict)
 
     # Store the token in Firebase Realtime Database
-    fb.add_value(path='/Tokens', data={dynamic_data: -1})
+    fb.add_value(path='/Tokens', data={dynamic_data: content_dict})
 
     # Create QR code
     qr = qrcode.QRCode(
@@ -92,7 +93,7 @@ def check_value():
     # Retrieve the location from the query parameters
     location = request.args.get('location')
     result = fb.start_listener(location=location)
-    return jsonify({'value': result})
+    return jsonify(result)
 
 
 @app.route('/', methods=['GET', 'POST'])
