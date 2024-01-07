@@ -1,11 +1,11 @@
 import threading
-
 from firebase_admin import db
 
 
 class RealtimeDatabaseListener:
     def __init__(self):
         self.updated_value = None
+        self.listener = None  # Added a listener attribute
 
     def callback(self, event):
         if event.event_type == 'put':
@@ -16,13 +16,17 @@ class RealtimeDatabaseListener:
         ref = db.reference(location)
         self.updated_value = dict(ref.get())
 
+        # Close the previous listener if exists
+        if self.listener:
+            self.listener.close()
+
+        # Start a new listener
+        self.listener = ref.listen(self.callback)
+
         # Wait for an update with a child named "result"
         while True:
-            ref.listen(self.callback)
             if "verified" in self.updated_value.keys():
                 return self.updated_value
-        return
-
 
     def remove_location(self, location):
         ref = db.reference(location)
@@ -31,4 +35,3 @@ class RealtimeDatabaseListener:
 
     def add_value(self, path, data):
         db.reference(path).update(data)
-

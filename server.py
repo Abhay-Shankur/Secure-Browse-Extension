@@ -38,7 +38,8 @@ def generate_qr_code_content():
     content_json = json.dumps(content_dict)
 
     # Store the token in Firebase Realtime Database
-    fb.add_value(path='/Tokens', data={dynamic_data: content_dict})
+    # fb.add_value(path='/Tokens', data={dynamic_data: content_dict})
+    fb.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
 
     # Create QR code
     qr = qrcode.QRCode(
@@ -83,16 +84,21 @@ def qr_code():
     next_url = getattr(app, 'next_url', '')
 
     # Retrieve the latest token from Firebase Realtime Database
-    location = '/Tokens/' + qr_code_content['token']
+    # location = '/Tokens/' + qr_code_content['token']
+    token = qr_code_content['token']
 
-    return render_template('qr_code.html', location=location, next_url=next_url)
+    # return render_template('qr_code.html', location=location, next_url=next_url)
+    return render_template('qr_code.html', token=token, next_url=next_url)
 
 
 @app.route('/check_value')
 def check_value():
     # Retrieve the location from the query parameters
-    location = request.args.get('location')
-    result = fb.start_listener(location=location)
+    # location = request.args.get('location')
+    token = request.args.get('token')
+    # result = fb.start_listener(location=location)
+    result = fb.get_updated_document(collection_name='Tokens', document_id=token)
+    fb.close_connection()
     return jsonify(result)
 
 
