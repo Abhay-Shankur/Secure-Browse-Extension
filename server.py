@@ -1,21 +1,19 @@
-import os
-import qrcode
 import json
+import os
 import random
 import string
+
+import qrcode
 from flask import Flask, render_template, request, jsonify
 
 from firebaseoperations.firebase_operations import FirebaseOperations
-from firebaseoperations.realtime_database import RealtimeDatabaseListener
-from models.admin import Admin
-
 from models.api_handler import ApiHandler
 
 app = Flask(__name__)
 # fb = RealtimeDatabaseListener()
 # admin = Admin()
 fb = FirebaseOperations()
-handler = ApiHandler(fb)
+# handler = ApiHandler(fb)
 
 # List of protected URLs
 protected_urls = [
@@ -98,8 +96,9 @@ def check_value():
     token = request.args.get('token')
     # result = fb.start_listener(location=location)
     result = fb.get_updated_document(collection_name='Tokens', document_id=token)
+    result = result.get('verified', False)
     fb.close_connection()
-    return jsonify(result)
+    return jsonify({'verified': result})
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -118,7 +117,8 @@ def index():
         # handler = Admin()
         # handler.issue_credentials(subjectDid=sender_id, fields=data)
     # collections=[fd.get_matching_doc(collection_name=collection) for collection in fd.get_all_collections()]
-    collections = handler.get_status()
+    # collections = handler.get_status()
+    collections = ''
     return render_template('index.html', collections=collections)
 
 

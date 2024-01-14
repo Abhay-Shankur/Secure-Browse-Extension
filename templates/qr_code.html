@@ -4,15 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic QR Code</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+
+        .notification {
+            display: none;
+            font-size: 18px;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .verified {
+            color: #4CAF50;
+        }
+
+        .failed {
+            color: #FF5733;
+        }
+    </style>
 </head>
 <body>
     <h1>Dynamic QR Code</h1>
     <img src="{{ url_for('static', filename='dynamic_qr_code.png') }}" alt="Dynamic QR Code">
-
-    
-    <!-- Add a hidden input field with the value of location -->
-<!--    <input type="hidden" id="location" name="location" value="{{ location }}">-->
-
 
     <!-- Add a hidden input field with the value of location -->
     <input type="hidden" id="token" name="token" value="{{ token }}">
@@ -20,34 +53,36 @@
     <!-- Add a hidden input field with the value of url -->
     <input type="hidden" id="next_url" name="next_url" value="{{ next_url }}">
 
-
+    <!-- Notification div -->
+    <div id="notification" class="notification"></div>
 
     <script>
-        // Function to check the value at location in Firebase Realtime Database
         async function checkFirebaseValue() {
-            // Get the location value from the hidden input field
             const token = document.getElementById('token').value;
             const next_url = document.getElementById('next_url').value;
+            const notification = document.getElementById('notification');
 
-            // Fetch the value from Firebase Realtime Database
-            const response = await fetch(`/check_value?token=${token}`);
+            const response = await fetch(`http://127.0.0.1:5000/check_value?token=${token}`);
             const data = await response.json();
 
-            // Check the value and redirect accordingly
             if (data.verified) {
-                // Show a popup notification after the redirect
-                alert('Redirecting to a particular URL. Check your destination!');
-                // Redirect to a particular URL
-                window.location.href = next_url;
+                notification.textContent = 'Verification successful! Redirecting to your destination...';
+                notification.className = 'notification verified';
+                setTimeout(() => {
+                    window.location.href = next_url;
+                }, 3000);
             } else {
-                // Show a popup notification after the redirect
-                alert('Verification has Failed!');
-                // Redirect back to /qr_code
-                window.location.href = '/qr_code';
+                notification.textContent = 'Verification failed! Redirecting back to QR code page...';
+                notification.className = 'notification failed';
+                setTimeout(() => {
+                    window.location.href = '/qr_code';
+                }, 3000);
             }
+
+            // Show the notification
+            notification.style.display = 'block';
         }
 
-        // Call the function when the page loads
         checkFirebaseValue();
     </script>
 </body>
