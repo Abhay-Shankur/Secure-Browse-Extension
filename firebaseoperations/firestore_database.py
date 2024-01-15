@@ -16,15 +16,6 @@ class FirebaseDataConnect:
         if self.db:
             self.db.close()
 
-    # Function to fetch data from Firebase
-    # def fetch_data_from_firebase(self):
-    #     # Assuming you have a collection named 'data' and a document with field 'datastring'
-    #     # doc_ref = self.db.collection('users').document('your_document_id')
-    #     doc_ref = self.db.collection('users')
-    #     print(doc_ref)
-    #     # data = doc_ref.get().to_dict().get('datastring', '')
-    #     # return data
-
     def get_all_collections(self):
         # Initialize Firestore connection if not already initialized
         if not self.db:
@@ -141,6 +132,85 @@ class FirebaseDataConnect:
         self.close_firestore()
 
         return updated_document
+
+    def add_value_to_list_field(self, collection_name="ORG", document_id=None, field_name=None, new_value=None):
+        """
+        Add a value to a list field in a specific document.
+
+        Args:
+        - collection_name (str): The name of the collection.
+        - document_id (str): The ID of the document to update.
+        - field_name (str): The name of the list field.
+        - new_value: The value to add to the list.
+
+        Returns:
+        - bool: True if the update is successful, False otherwise.
+        """
+        # Initialize Firestore connection if not already initialized
+        if not self.db:
+            self.initialize_firestore()
+
+        # Get the reference to the document
+        document_ref = self.db.collection(collection_name).document(document_id)
+
+        # Use a transaction to ensure data consistency
+        @firestore.transactional
+        def update_transaction(transaction, doc_ref, field, value):
+            # Get the current state of the document
+            doc = transaction.get(doc_ref)
+
+            # Update the set field
+            current_set = set(doc.get(field, []))
+            current_set.add(value)
+
+            # Update the document with the new list
+            transaction.update(doc_ref, {field: list(current_set)})
+
+        try:
+            # Run the transaction to update the document
+            self.db.run_transaction(update_transaction, document_ref, field_name, new_value)
+
+            # Close Firestore connection after the operation
+            self.close_firestore()
+
+            return True
+        except Exception as e:
+            print(f"Error updating document: {e}")
+
+            # Close Firestore connection after the operation
+            self.close_firestore()
+
+            return False
+
+    def get_list_field_values(self, collection_name="ORG", document_id=None, field_name=None):
+        """
+        Get the values of a list field from a specific document.
+
+        Args:
+        - collection_name (str): The name of the collection.
+        - document_id (str): The ID of the document.
+        - field_name (str): The name of the list field.
+
+        Returns:
+        - list: The values in the list field, or an empty list if the field is not found.
+        """
+        # Initialize Firestore connection if not already initialized
+        if not self.db:
+            self.initialize_firestore()
+
+        # Get the reference to the document
+        document_ref = self.db.collection(collection_name).document(document_id)
+
+        # Get the document data
+        document_data = document_ref.get().to_dict()
+
+        # Get the values of the list field
+        list_values = document_data.get(field_name, [])
+
+        # Close Firestore connection after the operation
+        self.close_firestore()
+
+        return list_values
 
     def close_connection(self):
         # Stop the listener before closing the connection

@@ -6,20 +6,23 @@ import string
 import qrcode
 from flask import Flask, render_template, request, jsonify
 
-from firebaseoperations.firebase_operations import FirebaseOperations
-from models.api_handler import ApiHandler
+from handlers.organization import Organization
 
 app = Flask(__name__)
 # fb = RealtimeDatabaseListener()
 # admin = Admin()
-fb = FirebaseOperations()
+app_name = 'QRVerify'
+# fb = FirebaseOperations(app_name=app_name)
+org = Organization(app_name=app_name)
 # handler = ApiHandler(fb)
 
 # List of protected URLs
-protected_urls = [
-    "https://www.youtube.com",
-    # Add other URLs as needed
-]
+if org.is_logged_in():
+    protected_urls = org.get_url()
+else:
+    protected_urls = [
+        "https://www.youtube.com",
+    ]
 
 
 # Function to generate dynamic QR code content
@@ -37,7 +40,8 @@ def generate_qr_code_content():
 
     # Store the token in Firebase Realtime Database
     # fb.add_value(path='/Tokens', data={dynamic_data: content_dict})
-    fb.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
+    # fb.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
+    org.firebaseHandler.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
 
     # Create QR code
     qr = qrcode.QRCode(
@@ -95,9 +99,9 @@ def check_value():
     # location = request.args.get('location')
     token = request.args.get('token')
     # result = fb.start_listener(location=location)
-    result = fb.get_updated_document(collection_name='Tokens', document_id=token)
+    result = org.firebaseHandler.get_updated_document(collection_name='Tokens', document_id=token)
     result = result.get('verified', False)
-    fb.close_connection()
+    org.firebaseHandler.close_connection()
     return jsonify({'verified': result})
 
 
@@ -134,6 +138,14 @@ def issue():
     if request.method == 'POST':
         pass
     return render_template('issue.html')
+
+
+@app.route('/add_org', methods=['GET', 'POST'])
+def set_org():
+    if request.method == 'POST':
+        pass
+    else:
+        pass
 
 
 if __name__ == '__main__':
