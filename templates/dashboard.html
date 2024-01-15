@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OptiSecure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://kit.fontawesome.com/476c31837b.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="navbar">
+      <span>OptiSecure</span>
+      <div class="logout">Logout</div>
+    </div>
+    <div class="container">
+      <div class="left-container">
+        <div class="left-top">
+          <div class="user">
+            <div class="user-title">Connected Users</div>
+            <div class="user-body">
+              <ul>
+                <li>User 1</li>
+                <li>User 2</li>
+                <li>User 3</li>
+                <li>User 1</li>
+            </ul>
+            </div>
+            <form method="post"  class="user-bottom">
+              <input type="text" name="user" id="add-user" placeholder="Enter User DID ...">
+              <button class="fa-solid fa-circle-plus" type="submit"></button>
+            </form>
+          </div>
+        </div>
+        <div class="left-bottom">
+          <div class="url">
+            <div class="url-title">Protected URLs</div>
+            <div class="url-body">
+              <ul>
+                <li>User 1</li>
+                <li>User 2</li>
+                <li>User 3</li>
+            </ul>
+            </div>
+            <form method="post"  class="url-bottom">
+              <input type="text" name="url" id="add-url" placeholder="Enter User DID ...">
+              <button class="fa-solid fa-circle-plus" type="submit"></button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="right-container">
+        <form action="" method="post" class="issue-credentials-form">
+          <div>
+            <h2>Issue Credentials</h2>
+            <label for="userID">User ID:</label>
+            <select id="userID" name="userID" required>
+                <option value="" selected disabled>Select a UserID</option>
+                <option value="user1">User 1</option>
+                <option value="user2">User 2</option>
+                <option value="user3">User 3</option>
+            </select>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter email" required>
+
+            <label for="aadhar">Aadhar Number:</label>
+            <input type="text" id="aadhar" name="aadhar" placeholder="Enter Aadhar number" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+          </div>
+
+          <button type="submit">Issue Credentials</button>
+      </form>
+
+      </div>
+    </div>
+  </body>
+</html>

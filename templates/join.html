@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Organisation - OptiSecure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='join.css') }}">
+</head>
+<body>
+    <div class="join-container">
+        <h1>Join an Organisation</h1>
+        <form action="/join" method="post">
+            <label for="organization">Select an Organisation:</label>
+            <select id="organization" name="organization" required>
+                <option value="" selected disabled>Select an Organisation</option>
+                <option value="org1">Organisation 1</option>
+                <option value="org2">Organisation 2</option>
+                <option value="org3">Organisation 3</option>
+            </select>
+
+            <button type="submit">Join</button>
+        </form>
+        <p class="login-link">Already have an account? <a href="/login">Login</a></p>
+    </div>
+</body>
+</html>

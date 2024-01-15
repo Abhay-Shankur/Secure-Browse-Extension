@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - OptiSecure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <h1>OptiSecure Login</h1>
+        <form action="/login" method="post">
+            <label for="orgName">OrgName:</label>
+            <input type="text" id="orgName" name="orgName" placeholder="Enter OrgName" required>
+
+            <label for="orgEmail">OrgEmail:</label>
+            <input type="email" id="orgEmail" name="orgEmail" placeholder="Enter OrgEmail" required>
+
+            <label for="orgPass">OrgPass:</label>
+            <input type="password" id="orgPass" name="orgPass" placeholder="Enter OrgPass" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <p class="join-org-link">Don't have an account? <a href="/join">Join a Organisation</a></p>
+    </div>
+</body>
+</html>

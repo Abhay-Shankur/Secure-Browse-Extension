@@ -1,0 +1,218 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f2f2f2;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
+
+/* .navbar {
+    background-color: #3498db;
+    margin: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    color: white;
+} */
+.navbar {
+    background-color: #3498db; /* Set your desired background color */
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+.navbar span {
+    color: #ffffff; /* Set text color to white or your preferred color */
+    font-size: 1.5em; /* Adjust the font size */
+}
+
+.logout {
+    background-color: #e74c3c; /* Set your desired background color */
+    color: #ffffff; /* Set text color to white or your preferred color */
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Add a smooth transition effect */
+
+}
+
+.logout:hover {
+    background-color: #c0392b; /* Darker shade on hover */
+}
+
+
+.container {
+    height: -webkit-fill-available;
+    display: flex;
+    flex-direction: row;
+    margin: 15px;
+}
+
+.left-container, .right-container {
+    display: flex;
+    flex-direction: column;
+    /* width: 50%; */
+    flex: 1;
+    height: -webkit-fill-available;
+    margin: 15px;
+}
+
+.left-container {
+    justify-content: space-between;
+    border: none;
+    box-shadow: none;
+    background-color: inherit;
+}
+
+.left-top, .left-bottom {
+    height: calc(50% - 10px);
+    width: -webkit-fill-available;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.user, .url {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: -webkit-fill-available;
+    padding: 0 20px;
+}
+
+.user-title, .url-title {
+    border-bottom: 2px groove #3498db;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #3498db;
+    padding-top: 10px;
+}
+
+.user-body, .url-body {
+    height: auto;
+    max-height: 200px;
+    overflow-y: auto;
+    /* box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.1);  */
+    border: 1px groove #ccc;
+    /* background-color: #ecf0f1; */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.user-body ul, .url-body ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-body li, .url-body li {
+    padding: 10px;
+    border-bottom: 1px solid #bdc3c7;
+    color: #34495e;
+}
+
+.user-body li:last-child, .url-body li:last-child {
+    border-bottom: none;
+}
+
+.user-bottom, .url-bottom {
+    display: flex;
+    flex-direction: row;
+    width: -webkit-fill-available;
+    height: min-content;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-bottom input, .url-bottom input {
+    flex-grow: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+}
+
+.user-bottom .fa-circle-plus, .url-bottom .fa-circle-plus {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.user-bottom .fa-circle-plus:hover, .url-bottom .fa-circle-plus:hover {
+    background-color: #2980b9;
+}
+
+
+.issue-credentials-form {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: ; */
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    border: 1px solid #ddd;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.issue-credentials-form > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.issue-credentials-form h2 {
+    font-size: 2em;
+    margin-bottom: 15px;
+    border-bottom: 2px groove #3498db;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.issue-credentials-form label {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.issue-credentials-form select,
+.issue-credentials-form input,
+.issue-credentials-form button {
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.issue-credentials-form button {
+    margin: auto 0;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.issue-credentials-form button:hover {
+    background-color: #2980b9; /* Darker shade on hover */
+}

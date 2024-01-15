@@ -78,12 +78,16 @@ def protected_redirect():
     return jsonify({'protected': protected})
 
 
-@app.route('/qr_code')
+@app.route('/qr_code', methods=['GET', 'POST'])
 def qr_code():
     # Pass the dynamic QR code URL to the template
     generate_qr_code_content()
     qr_code_content = getattr(app, 'content', None)
     next_url = getattr(app, 'next_url', '')
+
+    if request.method == 'POST':
+        data = request.get_json()
+        next_url = data.get('next_url', '')
 
     # Retrieve the latest token from Firebase Realtime Database
     # location = '/Tokens/' + qr_code_content['token']
@@ -93,15 +97,20 @@ def qr_code():
     return render_template('qr_code.html', token=token, next_url=next_url)
 
 
-@app.route('/check_value')
+@app.route('/check_value', methods=['GET'])
 def check_value():
     # Retrieve the location from the query parameters
-    # location = request.args.get('location')
     token = request.args.get('token')
-    # result = fb.start_listener(location=location)
+
     result = org.firebaseHandler.get_updated_document(collection_name='Tokens', document_id=token)
+
+    with app.app_context():
+        app.next_url = result.get('next_url','')
+
     result = result.get('verified', False)
+
     org.firebaseHandler.close_connection()
+
     return jsonify({'verified': result})
 
 
@@ -123,29 +132,38 @@ def index():
     # collections=[fd.get_matching_doc(collection_name=collection) for collection in fd.get_all_collections()]
     # collections = handler.get_status()
     collections = ''
-    return render_template('index.html', collections=collections)
+    # return render_template('index.html', collections=collections)
+    return render_template('dashboard.html', collections=collections)
 
 
-@app.route('/create', methods=['GET', 'POST'])
-def create():
-    if request.method == 'POST':
-        pass
-    return render_template('create.html')
-
-
-@app.route('/issue', methods=['GET', 'POST'])
-def issue():
-    if request.method == 'POST':
-        pass
-    return render_template('issue.html')
-
-
-@app.route('/add_org', methods=['GET', 'POST'])
-def set_org():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         pass
     else:
+        return render_template('login.html')
+
+
+@app.route('/join', methods=['GET', 'POST'])
+def join():
+    if request.method == 'POST':
         pass
+    else:
+        return render_template('join.html')
+# @app.route('/create', methods=['GET', 'POST'])
+# def create():
+#     if request.method == 'POST':
+#         pass
+#     return render_template('create.html')
+#
+#
+# @app.route('/issue', methods=['GET', 'POST'])
+# def issue():
+#     if request.method == 'POST':
+#         pass
+#     return render_template('issue.html')
+
+
 
 
 if __name__ == '__main__':
