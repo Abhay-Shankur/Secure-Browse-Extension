@@ -8,7 +8,9 @@
   <body>
     <div class="navbar">
       <span>OptiSecure</span>
-      <div class="logout">Logout</div>
+      <div class="logout">
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
     </div>
     <div class="container">
       <div class="left-container">
@@ -17,14 +19,17 @@
             <div class="user-title">Connected Users</div>
             <div class="user-body">
               <ul>
-                <li>User 1</li>
-                <li>User 2</li>
-                <li>User 3</li>
-                <li>User 1</li>
+                {% for user in users %}
+                    <li>{{ user }}</li>
+                {% endfor %}
+<!--                <li>User 1</li>-->
+<!--                <li>User 2</li>-->
+<!--                <li>User 3</li>-->
+<!--                <li>User 1</li>-->
             </ul>
             </div>
-            <form method="post"  class="user-bottom">
-              <input type="text" name="user" id="add-user" placeholder="Enter User DID ...">
+            <form action="/add-user" method="post"  class="user-bottom">
+              <input type="text" name="user" id="add-user" placeholder="Enter User DID ..." required>
               <button class="fa-solid fa-circle-plus" type="submit"></button>
             </form>
           </div>
@@ -34,28 +39,35 @@
             <div class="url-title">Protected URLs</div>
             <div class="url-body">
               <ul>
-                <li>User 1</li>
-                <li>User 2</li>
-                <li>User 3</li>
+                {% for url in urls %}
+                    <li>{{ url }}</li>
+                {% endfor %}
+<!--                <li>Link 1</li>-->
+<!--                <li>Link 2</li>-->
+<!--                <li>Link 3</li>-->
             </ul>
             </div>
-            <form method="post"  class="url-bottom">
-              <input type="text" name="url" id="add-url" placeholder="Enter User DID ...">
+            <form action="/add-url" method="post"  class="url-bottom">
+              <input type="text" name="url" id="add-url" placeholder="Enter Links to Protect ..." required>
               <button class="fa-solid fa-circle-plus" type="submit"></button>
             </form>
           </div>
         </div>
       </div>
       <div class="right-container">
-        <form action="" method="post" class="issue-credentials-form">
+        <form action="/issue_credentials" method="post" class="issue-credentials-form">
           <div>
             <h2>Issue Credentials</h2>
             <label for="userID">User ID:</label>
             <select id="userID" name="userID" required>
                 <option value="" selected disabled>Select a UserID</option>
-                <option value="user1">User 1</option>
-                <option value="user2">User 2</option>
-                <option value="user3">User 3</option>
+                {% for user in users %}
+                  <option value="{{ user }}">{{ user }}</option>
+                    <li>{{ user }}</li>
+                {% endfor %}
+<!--                <option value="user1">User 1</option>-->
+<!--                <option value="user2">User 2</option>-->
+<!--                <option value="user3">User 3</option>-->
             </select>
 
             <label for="username">Username:</label>

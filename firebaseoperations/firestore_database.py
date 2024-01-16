@@ -150,25 +150,19 @@ class FirebaseDataConnect:
         if not self.db:
             self.initialize_firestore()
 
-        # Get the reference to the document
-        document_ref = self.db.collection(collection_name).document(document_id)
-
-        # Use a transaction to ensure data consistency
-        @firestore.transactional
-        def update_transaction(transaction, doc_ref, field, value):
+        try:
+            # Get the reference to the document
+            document_ref = self.db.collection(collection_name).document(document_id)
             # Get the current state of the document
-            doc = transaction.get(doc_ref)
+            doc_snapshot = document_ref.get()
+            doc_data = doc_snapshot.to_dict()
 
             # Update the set field
-            current_set = set(doc.get(field, []))
-            current_set.add(value)
+            current_set = set(doc_data.get(field_name, []))
+            current_set.add(new_value)
 
             # Update the document with the new list
-            transaction.update(doc_ref, {field: list(current_set)})
-
-        try:
-            # Run the transaction to update the document
-            self.db.run_transaction(update_transaction, document_ref, field_name, new_value)
+            document_ref.update({field_name: list(current_set)})
 
             # Close Firestore connection after the operation
             self.close_firestore()

@@ -2,13 +2,15 @@ import json
 import os
 import random
 import string
+from functools import wraps
 
 import qrcode
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 from handlers.organization import Organization
 
 app = Flask(__name__)
+app.secret_key = 'qr_verify_3812'
 # fb = RealtimeDatabaseListener()
 # admin = Admin()
 app_name = 'QRVerify'
@@ -18,7 +20,7 @@ org = Organization(app_name=app_name)
 
 # List of protected URLs
 if org.is_logged_in():
-    protected_urls = org.get_url()
+    protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
 else:
     protected_urls = [
         "https://www.youtube.com",
@@ -105,7 +107,7 @@ def check_value():
     result = org.firebaseHandler.get_updated_document(collection_name='Tokens', document_id=token)
 
     with app.app_context():
-        app.next_url = result.get('next_url','')
+        app.next_url = result.get('next_url', '')
 
     result = result.get('verified', False)
 
@@ -114,57 +116,130 @@ def check_value():
     return jsonify({'verified': result})
 
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'uid' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+@login_required
 def index():
     if request.method == 'POST':
         pass
-        # sender_id = request.form['sender_id']
-        # data = {
-        #     "aadhar": request.form['adhar_number'],
-        #     "name": request.form['name'],
-        #     "email": request.form['gmail'],
-        #     "role": "User",
-        #     "dob": request.form['dob']
-        # }
-        # handler = Admin()
-        # handler.issue_credentials(subjectDid=sender_id, fields=data)
-    # collections=[fd.get_matching_doc(collection_name=collection) for collection in fd.get_all_collections()]
-    # collections = handler.get_status()
     collections = ''
+    if session['uid'] is not None:
+        # session_org = org.get_org()
+        list_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
+        if list_urls is None:
+            list_urls = list()
+        list_users = org.get_list(collection='ORG', field='users', uid=session['uid'])
+        if list_users is None:
+            list_users = list()
     # return render_template('index.html', collections=collections)
-    return render_template('dashboard.html', collections=collections)
+    return render_template('dashboard.html', users=list_users, urls=list_urls)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        pass
-    else:
-        return render_template('login.html')
+        # TODO:Store Auth uid in session.
+        # Get the form data
+        orgName = request.form.get('orgName')
+        orgEmail = request.form.get('orgEmail')
+        orgPass = request.form.get('orgPass')
+
+        formData = {
+            'orgName': orgName,
+            'orgEmail': orgEmail,
+            'orgPass': orgPass
+        }
+
+        uid = org.authenticate_org(details=formData)
+        if uid is not None:
+            session['uid'] = uid
+            print("UID set in session:", uid)
+            return redirect(url_for('index'))
+
+    return render_template('login.html')
+
+
+# Route to handle logout
+@app.route('/logout')
+def logout():
+    # Clear the uid from the session
+    if 'uid' in session:
+        session.pop('uid', None)
+    return redirect(url_for('login'))
+
+
+@app.route('/issue_credentials', methods=['POST'])
+def issue_credentials():
+    if request.method == 'POST':
+        # Get the form data
+        user_id = request.form.get('userID')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        aadhar = request.form.get('aadhar')
+        dob = request.form.get('dob')
+
+        # Process the data as needed
+        # For example, you can store it in a database or perform any other actions
+
+        # For now, let's just print the data
+        print(f"Issuing credentials for User ID: {user_id}")
+        print(f"Username: {username}")
+        print(f"Email: {email}")
+        print(f"Aadhar Number: {aadhar}")
+        print(f"Date of Birth: {dob}")
+
+        # You can return a response as needed
+        print("Credentials issued successfully!")
+    return redirect(url_for('index'))
+
+
+@app.route('/add-user', methods=['POST'])
+def add_user():
+    if request.method == 'POST':
+        # Get the form data
+        user = request.form.get('user')
+
+        # For now, let's just print the data
+        print(f"Added User ID: {user}")
+
+        # You can return a response as needed
+        print("User ID Added successfully!")
+
+    return redirect(url_for('index'))
+
+
+@app.route('/add-url', methods=['POST'])
+def add_url():
+    if request.method == 'POST':
+        # Get the form data
+        url = request.form.get('url')
+
+        # For now, let's just print the data
+        print(f"Adding Url: {url}")
+        uid = session['uid']
+        org.set_list(collection='ORG', field='urls', value=url, uid=uid)
+        # You can return a response as needed
+        print("Added URL successfully!")
+    return redirect(url_for('index'))
 
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
     if request.method == 'POST':
-        pass
-    else:
-        return render_template('join.html')
-# @app.route('/create', methods=['GET', 'POST'])
-# def create():
-#     if request.method == 'POST':
-#         pass
-#     return render_template('create.html')
-#
-#
-# @app.route('/issue', methods=['GET', 'POST'])
-# def issue():
-#     if request.method == 'POST':
-#         pass
-#     return render_template('issue.html')
+        # Get the form data
+        organization = request.form.get('organization')
 
-
-
+    return render_template('join.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

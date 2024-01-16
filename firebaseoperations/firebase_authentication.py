@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import auth
 
 
 def sign_up(email, password):
@@ -17,11 +17,12 @@ def sign_in(email, password):
     try:
         # TODO: Signin
         # Sign in with email and password
-        user = auth.get_user_by_email(email)
-        auth_user = auth.authenticate(email=email, password=password)
+        # user = auth.get_user_by_email(email)
+        # auth.generate_sign_in_with_email_link(email, ACTIOn)
+        auth_user = auth.sign_in_with_email_and_password(email=email, password=password)
         print(f"User signed in successfully: {auth_user.uid}")
         return auth_user.uid
-    except auth.AuthError as e:
+    except Exception as e:
         print(f"Error signing in: {e}")
         return None
 
@@ -32,7 +33,7 @@ def check_authentication(uid):
         user = auth.get_user(uid)
         print(f"User is signed in: {user.uid}")
         return user
-    except auth.AuthError as e:
+    except Exception as e:
         print(f"User is not signed in: {e}")
         return None
 
