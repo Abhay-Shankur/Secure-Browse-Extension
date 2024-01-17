@@ -109,11 +109,10 @@ class Organization:
         if uid is not None:
             org = check_authentication(uid)
             print(org.email)
-            return self.firebaseHandler.add_value_to_list_field(collection_name=collection, document_id=org.email,
+            return self.firebaseHandler.set_value_to_list_field(collection_name=collection, document_id=org.email,
                                                                 field_name=field, new_value=value)
         else:
-            print("in else")
-            return self.firebaseHandler.add_value_to_list_field(collection_name=collection, document_id=orgEmail,
+            return self.firebaseHandler.set_value_to_list_field(collection_name=collection, document_id=orgEmail,
                                                                 field_name=field, new_value=value)
 
     #       Get List of Values
@@ -124,3 +123,7 @@ class Organization:
                                                               field_name=field)
         else:
             return None
+
+    #       Display Organisation emails
+    def get_org_mails(self):
+        return self.firebaseHandler.display_document_names(collection_name='ORG')

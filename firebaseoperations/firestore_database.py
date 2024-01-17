@@ -16,18 +16,13 @@ class FirebaseDataConnect:
         if self.db:
             self.db.close()
 
-    def get_all_collections(self):
-        # Initialize Firestore connection if not already initialized
-        if not self.db:
-            self.initialize_firestore()
+    def close_connection(self):
+        # Stop the listener before closing the connection
+        if self.listener:
+            self.listener.unsubscribe()
 
-        # Retrieve all collections by listing all documents in the root
-        collections = [collection.id for collection in self.db.collections()]
-
-        # Close Firestore connection after the operation
+        # Close Firestore connection if not already closed
         self.close_firestore()
-
-        return collections
 
     # Function to Add Documents
     def add_doc(self, collection_name="Credentials", doc=None, doc_id=None):
@@ -42,6 +37,34 @@ class FirebaseDataConnect:
 
         return val
 
+    # Function to get all Collection
+    def get_all_collections(self):
+        # Initialize Firestore connection if not already initialized
+        if not self.db:
+            self.initialize_firestore()
+
+        # Retrieve all collections by listing all documents in the root
+        collections = [collection.id for collection in self.db.collections()]
+
+        # Close Firestore connection after the operation
+        self.close_firestore()
+
+        return collections
+
+    # Function to get all documents from Collection
+    def get_all_documents(self, collection_name="Credentials"):
+        # Initialize Firestore connection if not already initialized
+        if not self.db:
+            self.initialize_firestore()
+
+        collection_ref = self.db.collection(collection_name)
+        documents = collection_ref.stream()
+
+        # Close Firestore connection after the operation
+        self.close_firestore()
+        return documents
+
+    # Function to get document data from a collection
     def get_all_document_fields(self, collection_name="Credentials", document_id=None):
         # Initialize Firestore connection if not already initialized
         if not self.db:
@@ -55,23 +78,10 @@ class FirebaseDataConnect:
 
         return document_data
 
-    def get_all_documents(self, collection_name="Credentials"):
-        # Initialize Firestore connection if not already initialized
-        if not self.db:
-            self.initialize_firestore()
-
-        collection_ref = self.db.collection(collection_name)
-        documents = collection_ref.stream()
-
-        # Close Firestore connection after the operation
-        self.close_firestore()
-        return documents
-
+    # To get All Documents ID of a Collection
     def display_document_names(self, collection_name="Credentials"):
         all_documents = self.get_all_documents(collection_name=collection_name)
         return [document.id for document in all_documents]
-        # for document in all_documents:
-        #     print(f"Document ID: {document.id}")
 
     def get_matching_doc(self, collection_name="Credentials"):
         # Initialize Firestore connection if not already initialized
@@ -98,6 +108,7 @@ class FirebaseDataConnect:
         return data
         # print(total_count, active_count, on_leave_count)
 
+    # Function to get updated Document
     def get_updated_document(self, collection_name="Credentials", document_id=None):
         # Initialize Firestore connection if not already initialized
         if not self.db:
@@ -133,7 +144,8 @@ class FirebaseDataConnect:
 
         return updated_document
 
-    def add_value_to_list_field(self, collection_name="ORG", document_id=None, field_name=None, new_value=None):
+    # Function to add values to a list
+    def set_value_to_list_field(self, collection_name="ORG", document_id=None, field_name=None, new_value=None):
         """
         Add a value to a list field in a specific document.
 
@@ -157,12 +169,18 @@ class FirebaseDataConnect:
             doc_snapshot = document_ref.get()
             doc_data = doc_snapshot.to_dict()
 
-            # Update the set field
-            current_set = set(doc_data.get(field_name, []))
-            current_set.add(new_value)
-
-            # Update the document with the new list
-            document_ref.update({field_name: list(current_set)})
+            # Update the set field based on the type of new_value
+            if isinstance(new_value, dict):
+                # If new_value is a dictionary, update with its key-value pair
+                current_set = dict(doc_data.get(field_name, []))
+                for key, value in new_value.items():
+                    current_set[key] = value
+                document_ref.update({field_name: current_set})
+            else:
+                # If new_value is a single value, update the set field
+                current_set = set(doc_data.get(field_name, []))
+                current_set.add(new_value)
+                document_ref.update({field_name: list(current_set)})
 
             # Close Firestore connection after the operation
             self.close_firestore()
@@ -205,11 +223,3 @@ class FirebaseDataConnect:
         self.close_firestore()
 
         return list_values
-
-    def close_connection(self):
-        # Stop the listener before closing the connection
-        if self.listener:
-            self.listener.unsubscribe()
-
-        # Close Firestore connection if not already closed
-        self.close_firestore()

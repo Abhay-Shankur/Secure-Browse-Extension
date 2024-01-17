@@ -40,9 +40,7 @@ def generate_qr_code_content():
     }
     content_json = json.dumps(content_dict)
 
-    # Store the token in Firebase Realtime Database
-    # fb.add_value(path='/Tokens', data={dynamic_data: content_dict})
-    # fb.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
+    # Store the token in Firebase Database
     org.firebaseHandler.add_doc(collection_name='Tokens', doc=content_dict, doc_id=dynamic_data)
 
     # Create QR code
@@ -237,9 +235,13 @@ def add_url():
 def join():
     if request.method == 'POST':
         # Get the form data
-        organization = request.form.get('organization')
+        _organization = request.form.get('organization')
+        _did = request.form.get('did')
+        _ip_address = request.remote_addr
+        result = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='users', new_value={_ip_address: _did})
 
-    return render_template('join.html')
+    emails = org.get_org_mails()
+    return render_template('join.html', emails=emails, result=result)
 
 if __name__ == '__main__':
     app.run(debug=True)
