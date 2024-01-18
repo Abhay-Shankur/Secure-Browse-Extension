@@ -11,10 +11,6 @@
             <div class="notification success">
                 <p>Successfully joined the organization!</p>
             </div>
-        {% else %}
-            <div class="notification error">
-                <p>Failed to join the organization. Please try again.</p>
-            </div>
         {% endif %}
     <div class="join-container">
         <h1>Join an Organisation</h1>
@@ -28,6 +24,7 @@
             </select>
             <label for="did">Enter Your DID</label>
             <input type="text" name="did" id="did" placeholder="Enter your DID Id...." required>
+            <input type="email" name="email" id="email" placeholder="Enter your Email" required>
             <button type="submit">Join</button>
         </form>
         <p class="login-link">Already have an account? <a href="/login">Login</a></p>

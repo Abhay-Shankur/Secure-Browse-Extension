@@ -61,8 +61,8 @@
             <label for="userID">User ID:</label>
             <select id="userID" name="userID" required>
                 <option value="" selected disabled>Select a UserID</option>
-                {% for user in users %}
-                  <option value="{{ user }}">{{ user }}</option>
+                {% for email in emails %}
+                  <option value="{{ email }}">{{ email }}</option>
 <!--                    <li>{{ user }}</li>-->
                 {% endfor %}
 <!--                <option value="user1">User 1</option>-->

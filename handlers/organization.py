@@ -40,10 +40,11 @@ class Organization:
         try:
             self._uid = sign_up(email=details['orgEmail'], password=details['orgPass'])
             if self._uid is not None:
-                # didDoc = self._apiHandler.register_did()
-                didDoc = {
-                    'did': 'jncjdsnjcnncvnnn'
-                }
+                # Registering New User
+                didDoc = self._apiHandler.register_did()
+                # didDoc = {
+                #     'did': 'jncjdsnjcnncvnnn'
+                # }
                 details['didDoc'] = didDoc.get('did', '')
                 self.firebaseHandler.add_doc(collection_name='ORG', doc=details, doc_id=details['orgEmail'])
                 self.firebaseHandler.add_doc(collection_name='DID', doc=didDoc, doc_id=details['didDoc'])
@@ -85,11 +86,21 @@ class Organization:
 
     #       Issue Credentials to Organization User
     def issue_credentials(self, subjectTo, credentials):
-        cred = self._apiHandler.issue_credentials(subjectDid=subjectTo, issuerDid=self._uid, fields=credentials)
-        cred = cred.get('credentialDocument', None)
-        # TODO: Make sure to handle VC after creating
-        self.firebaseHandler.add_doc(collection_name="Credentials", doc=cred, doc_id=cred['id'])
-        return cred['id']
+        try:
+            issuer = self.get_org().email
+            docs = self.firebaseHandler.get_all_document_fields(collection_name='ORG', document_id=issuer)
+            receiver = self.firebaseHandler.get_all_document_fields(collection_name='USER', document_id=subjectTo)
+            cred = self._apiHandler.issue_credentials(subjectDid=receiver['did'], issuerDid=docs['did'], fields=credentials)
+            # cred = cred.get('credentialDocument', None)
+            # TODO: Make sure to handle VC after creating
+            self.firebaseHandler.add_doc(collection_name="Credentials", doc=cred, doc_id=cred['credentialDocument']['id'])
+            self.firebaseHandler.set_value_to_list_field(collection_name='USER',document_id=subjectTo,field_name='credentials',new_value=cred['credentialDocument']['id'])
+            return True
+        except Exception as e:
+            print(e)
+            return False
+        # self.firebaseHandler
+        # return cred['id']
 
     # #       Get Organization User
     #     def set_user_list(self, userId, orgEmail=None):
@@ -108,7 +119,6 @@ class Organization:
     def set_list(self, collection, field, value, uid=None, orgEmail=None):
         if uid is not None:
             org = check_authentication(uid)
-            print(org.email)
             return self.firebaseHandler.set_value_to_list_field(collection_name=collection, document_id=org.email,
                                                                 field_name=field, new_value=value)
         else:

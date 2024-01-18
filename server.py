@@ -139,8 +139,11 @@ def index():
         list_users = org.get_list(collection='ORG', field='users', uid=session['uid'])
         if list_users is None:
             list_users = list()
+        list_emails = org.get_list(collection='ORG', field='userEmail', uid=session['uid'])
+        if list_emails is None:
+            list_emails = list()
     # return render_template('index.html', collections=collections)
-    return render_template('dashboard.html', users=list_users, urls=list_urls)
+    return render_template('dashboard.html', users=list_users, urls=list_urls, emails=list_emails)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -195,9 +198,18 @@ def issue_credentials():
         print(f"Email: {email}")
         print(f"Aadhar Number: {aadhar}")
         print(f"Date of Birth: {dob}")
+        creds = {
+            'username': username,
+            'email': email,
+            'aadhar': aadhar,
+            'dob': dob
+        }
 
         # You can return a response as needed
-        print("Credentials issued successfully!")
+        if org.issue_credentials(subjectTo=user_id, credentials=creds):
+            print("Credentials issued Successfully!")
+        else:
+            print("Credentials issued failed!")
     return redirect(url_for('index'))
 
 
@@ -209,7 +221,8 @@ def add_user():
 
         # For now, let's just print the data
         print(f"Added User ID: {user}")
-
+        uid = session['uid']
+        org.set_list(collection='ORG', field='userEmail', value=user, uid=uid)
         # You can return a response as needed
         print("User ID Added successfully!")
 
@@ -233,15 +246,19 @@ def add_url():
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
+    emails = org.get_org_mails()
     if request.method == 'POST':
         # Get the form data
         _organization = request.form.get('organization')
         _did = request.form.get('did')
+        _email = request.form.get('email')
         _ip_address = request.remote_addr
-        result = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='users', new_value={_ip_address: _did})
+        res1 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='users', new_value={_ip_address: _did})
+        res2 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='userEmail', new_value=_email)
+        return render_template('join.html', emails=emails, result=(res1 and res2))
 
-    emails = org.get_org_mails()
-    return render_template('join.html', emails=emails, result=result)
+    return render_template('join.html', emails=emails)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
