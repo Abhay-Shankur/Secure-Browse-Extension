@@ -8,7 +8,7 @@ from flask_cors import CORS
 
 import qrcode
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-
+from preprocess import predictRes
 from handlers.organization import Organization
 
 app = Flask(__name__)
@@ -28,8 +28,9 @@ protected_urls = None
 
 # Load your pickled machine learning model
 CORS(app)
-model_path = 'model.pkl'
+model_path = 'phishing.pkl'
 phish_model = joblib.load(open(model_path, 'rb'))
+
 
 # For URL analysis
 # Define an API endpoint for prediction
@@ -39,14 +40,13 @@ def predict():
         # Get data from the request as JSON
         data = request.get_json(force=True)
 
-
         # Extract the URL from the request data
         # Assuming the URL is provided in the 'url' field
         url = data.get('url', '')
 
         # if "mail" in url or "chatgpt" in url:
         #     return jsonify({'prediction': "good"})
-        
+
         if "new-tab-page" in url or url == 'about:blank':
             return jsonify({'prediction': "good"})
 
@@ -57,19 +57,19 @@ def predict():
             raise ValueError("URL is missing in the request.")
 
         # Perform prediction using the loaded model
-        url = url.replace('https://', '')
-        print(url)
-        prediction = phish_model.predict([url])[0]
+        # url = url.replace('https://', '')
+        # prediction = phish_model.predict([url])[0]
 
         # Return the prediction as JSON
+        prediction = predictRes(url)
         print(prediction)
 
         return jsonify({'prediction': prediction})
     except Exception as e:
         return jsonify({'error': str(e)})
 
-# handler = ApiHandler(fb)
 
+# handler = ApiHandler(fb)
 
 
 # Function to generate dynamic QR code content
@@ -108,6 +108,7 @@ def generate_qr_code_content():
         app.qr_code_img_path = img_path
         app.content = content_dict
 
+
 @app.route('/check_url', methods=['POST'])
 def protected_redirect():
     data = request.get_json()
@@ -126,6 +127,9 @@ def protected_redirect():
     # Perform URL protection check
     protected = any(url.startswith(prefix) for prefix in protected_urls)
 
+    prev_url = getattr(app, 'prev_url', '')
+    if prev_url == url:
+        return jsonify({'protected': False})
     return jsonify({'protected': protected})
 
 
@@ -157,6 +161,7 @@ def check_value():
 
     with app.app_context():
         app.next_url = result.get('next_url', '')
+        app.prev_url = getattr(app, 'next_url', '')
 
     result = result.get('verified', False)
 
@@ -304,8 +309,10 @@ def join():
         _did = request.form.get('did')
         _email = request.form.get('email')
         _ip_address = request.remote_addr
-        res1 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='users', new_value={_ip_address: _did})
-        res2 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization, field_name='userEmail', new_value=_email)
+        res1 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
+                                                           field_name='users', new_value={_ip_address: _did})
+        res2 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
+                                                           field_name='userEmail', new_value=_email)
         return render_template('join.html', emails=emails, result=(res1 and res2))
 
     return render_template('join.html', emails=emails)
