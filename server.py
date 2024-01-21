@@ -3,6 +3,8 @@ import os
 import random
 import string
 from functools import wraps
+import joblib
+from flask_cors import CORS
 
 import qrcode
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
@@ -11,22 +13,63 @@ from handlers.organization import Organization
 
 app = Flask(__name__)
 app.secret_key = 'qr_verify_3812'
-# fb = RealtimeDatabaseListener()
-# admin = Admin()
 app_name = 'QRVerify'
-# fb = FirebaseOperations(app_name=app_name)
 org = Organization(app_name=app_name)
-# handler = ApiHandler(fb)
 
 # List of protected URLs
 protected_urls = None
-if org.is_logged_in():
-    protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
-    print(protected_urls)
-else:
-    protected_urls = [
-        "https://www.youtube.com",
-    ]
+# if org.is_logged_in():
+#     protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
+#     print(protected_urls)
+# else:
+#     protected_urls = [
+#         "https://www.youtube.com",
+#     ]
+
+# Load your pickled machine learning model
+CORS(app)
+model_path = 'model.pkl'
+phish_model = joblib.load(open(model_path, 'rb'))
+
+# For URL analysis
+# Define an API endpoint for prediction
+@app.route('/checkUrl', methods=['POST'])
+def predict():
+    try:
+        # Get data from the request as JSON
+        data = request.get_json(force=True)
+
+
+        # Extract the URL from the request data
+        # Assuming the URL is provided in the 'url' field
+        url = data.get('url', '')
+
+        # if "mail" in url or "chatgpt" in url:
+        #     return jsonify({'prediction': "good"})
+        
+        if "new-tab-page" in url or url == 'about:blank':
+            return jsonify({'prediction': "good"})
+
+        if len(url) <= 4 or url == "chrome://new-tab-page/":
+            return jsonify({'prediction': "good"})
+
+        if not url:
+            raise ValueError("URL is missing in the request.")
+
+        # Perform prediction using the loaded model
+        url = url.replace('https://', '')
+        print(url)
+        prediction = phish_model.predict([url])[0]
+
+        # Return the prediction as JSON
+        print(prediction)
+
+        return jsonify({'prediction': prediction})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+# handler = ApiHandler(fb)
+
 
 
 # Function to generate dynamic QR code content
@@ -65,7 +108,6 @@ def generate_qr_code_content():
         app.qr_code_img_path = img_path
         app.content = content_dict
 
-
 @app.route('/check_url', methods=['POST'])
 def protected_redirect():
     data = request.get_json()
@@ -78,7 +120,7 @@ def protected_redirect():
         protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
     else:
         protected_urls = [
-            "https://www.youtube.com",
+            "https://mod.gov.in/dod",
         ]
 
     # Perform URL protection check
