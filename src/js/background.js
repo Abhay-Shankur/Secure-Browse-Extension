@@ -48,10 +48,16 @@ chrome.webNavigation.onCommitted.addListener(async function (details) {
         const result = data.prediction === 'bad' ? 'This is a Phishing Site' : 'This is not a Phishing Site';
 
         if (data.prediction === 'bad') {
+            // Show an alert instead of redirecting to the warning page
+            const warningMessage = "Warning: This is a custom alert for the predicted tab.";
+            alert(warningMessage);
+
+            // Mark this tab as predicted (you may still need this for your logic)
+            predictedTabs.add(tabId);
             // Show the intermediate warning page
-            const warningPage = chrome.runtime.getURL('warning.html') + `?url=${encodeURIComponent(url)}`;
-            predictedTabs.add(tabId); // Mark this tab as predicted
-            chrome.tabs.update({ url: warningPage });
+            // const warningPage = chrome.runtime.getURL('warning.html') + `?url=${encodeURIComponent(url)}`;
+            // predictedTabs.add(tabId); // Mark this tab as predicted
+            // chrome.tabs.update({ url: warningPage });
         } else {
             // If prediction is good, log it or take other actions
             console.log('Good prediction:', result);
