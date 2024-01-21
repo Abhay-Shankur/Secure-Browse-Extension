@@ -19,8 +19,10 @@ org = Organization(app_name=app_name)
 # handler = ApiHandler(fb)
 
 # List of protected URLs
+protected_urls = None
 if org.is_logged_in():
     protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
+    print(protected_urls)
 else:
     protected_urls = [
         "https://www.youtube.com",
@@ -34,7 +36,7 @@ def generate_qr_code_content():
 
     # JSON content for the QR code
     content_dict = {
-        "type": ["VerifiableCredential", "Degree"],
+        "type": ["VerifiableCredential", "OptiSecure"],
         "token": dynamic_data,
         "next_url": getattr(app, 'next_url', ''),
     }
@@ -71,6 +73,13 @@ def protected_redirect():
 
     with app.app_context():
         app.next_url = url
+
+    if 'uid' in session:
+        protected_urls = org.get_list(collection='ORG', field='urls', uid=session['uid'])
+    else:
+        protected_urls = [
+            "https://www.youtube.com",
+        ]
 
     # Perform URL protection check
     protected = any(url.startswith(prefix) for prefix in protected_urls)

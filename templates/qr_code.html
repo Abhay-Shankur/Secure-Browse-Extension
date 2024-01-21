@@ -66,17 +66,14 @@
             const data = await response.json();
 
             if (data.verified) {
+                console.log(data.verified);
                 notification.textContent = 'Verification successful! Redirecting to your destination...';
                 notification.className = 'notification verified';
-                setTimeout(() => {
-                    window.location.href = next_url;
-                }, 3000);
+                window.location.href = next_url;
             } else {
                 notification.textContent = 'Verification failed! Redirecting back to QR code page...';
                 notification.className = 'notification failed';
-                setTimeout(() => {
-                    window.location.href = '/qr_code';
-                }, 3000);
+                window.location.href = '/qr_code';
             }
 
             // Show the notification

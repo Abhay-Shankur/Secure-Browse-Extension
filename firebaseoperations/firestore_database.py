@@ -217,7 +217,7 @@ class FirebaseDataConnect:
         document_data = document_ref.get().to_dict()
 
         # Get the values of the list field
-        list_values = document_data.get(field_name, [])
+        list_values = document_data.get(field_name, None)
 
         # Close Firestore connection after the operation
         self.close_firestore()

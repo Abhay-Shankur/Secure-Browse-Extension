@@ -8,7 +8,7 @@ def sign_up(email, password):
         user = auth.create_user(email=email, password=password)
         print(f"User created successfully: {user.uid}")
         return user.uid
-    except auth.AuthError as e:
+    except Exception as e:
         print(f"Error creating user: {e}")
         return None
 

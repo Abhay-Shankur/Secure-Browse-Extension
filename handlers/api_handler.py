@@ -1,3 +1,4 @@
+import json
 import time
 import requests
 
@@ -10,9 +11,9 @@ class ApiHandler:
         self.headers = None
         self.params = None
         # Initialize the 'config' attribute
-        self.config = {'baseUrl': 'https://api.entity.hypersign.id',
-                       'appApi': 'https://ent_7d1d2a9.api.entity.hypersign.id',
-                       'apiSecret': '8e160eaf60f98031d2987b236a8e4.c1f5715c66c7effeab03c2074dc96c68522fa28af58b9607eeba37cf902d721817c3afe10485d6e375341a83c4ad1fe55'}
+        self.config = {'baseUrl': 'https://api.entity.dashboard.hypersign.id',
+                       'appApi': 'https://ent_a5267cb.api.entity.hypersign.id',
+                       'apiSecret': 'f269173e5ff9256b2653dc48f65c1.efe6442a096026314bddae312527b68691e1696367031fde3504419f955bb264134ebae53dfefef6b11bfa99d8f608a80'}
         # Assuming that config is a dictionary containing 'baseUrl' and 'apiSecret'
         self.__authenticate_entity()
 
@@ -38,6 +39,7 @@ class ApiHandler:
             token_type = response_json.get("tokenType", "")
             expires_in = response_json.get("expiresIn", 0)
             self.__commit_access_token(access_token, token_type, expires_in)
+            print(self.config)
 
         except Exception as error:
             raise error
@@ -60,9 +62,15 @@ class ApiHandler:
             "namespace": "testnet"
         }
         self.headers = {
+            "accept": "application/json",
+            'Content-Type': 'application / json',
             'Authorization': self.config['Authorization']
         }
         try:
+            print(self.url)
+            print(self.headers)
+            print(self.params)
+
             response = requests.post(self.url, headers=self.headers, json=self.params)
             # Check the response status code
             if response.status_code == 201 or response.status_code == 200:
@@ -70,7 +78,7 @@ class ApiHandler:
                 # self.fb.add_doc(collection_name="DID", doc=response_json, doc_id=response_json.get("did", ""))
                 # print(self.fb.add_doc(collection_name="DID", doc=response_json, id=id))
                 # send_email(body=fields.get("aadhar", None), to_email=fields.get("email", None))
-                # print(response_json)
+                print(response_json)
                 # return response_json.get("did", "")
                 return response_json
             else:
@@ -84,11 +92,13 @@ class ApiHandler:
     def register_did(self):
         self.url = self.config['appApi'] + "/api/v1/did/register"
         self.headers = {
+            "Content-Type": "application/json",
             'Authorization': self.config['Authorization']
         }
         # doc_id = self.create_did()
         # doc = self.fb.get_all_document_fields(collection_name="DID", document_id=doc_id)
-        doc = self.create_did()
+        # doc = self.create_did()
+        # print(doc)
         # TODO: retry until it get
         # for _ in range(3):
         #     doc = self.create_did()
@@ -96,9 +106,21 @@ class ApiHandler:
         # while doc is None:
         #     doc = self.create_did()
 
+
+
+        # TODO: From HyperSign
+        # self.params = {
+        #     'didDocument': json_data['metaData']['didDocument'],
+        #     'verificationMethodId': json_data['metaData']['didDocument']["verificationMethod"][0]['id']
+        # }
+
+        # Assuming your JSON file is named 'your_file.json'
+        with open('create_json', 'r') as file:
+            json_data = json.load(file)
+
         self.params = {
-            'didDocument': doc['metaData']['didDocument'],
-            'verificationMethodId': doc['metaData']['didDocument']["verificationMethod"][0]['id']
+            'didDocument': json_data,
+            'verificationMethodId': json_data["verificationMethod"][0]['id']
         }
         try:
             response = requests.post(self.url, headers=self.headers, json=self.params)
@@ -126,7 +148,7 @@ class ApiHandler:
             'accept': 'application/json',
             'Authorization': self.config['Authorization']
         }
-        self.params ={
+        self.params = {
             "schemaId": schemaId,
             "subjectDid": subjectDid,
             "issuerDid": issuerDid,
@@ -153,3 +175,8 @@ class ApiHandler:
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
+
+
+# api = ApiHandler()
+# api = api.create_did()
+# api.register_did()
