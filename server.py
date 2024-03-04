@@ -13,8 +13,9 @@ from handlers.organization import Organization
 
 app = Flask(__name__)
 app.secret_key = 'qr_verify_3812'
-app_name = 'QRVerify'
+app_name = 'Server'
 org = Organization(app_name=app_name)
+# org = Organization()
 
 # List of protected URLs
 protected_urls = None
@@ -243,7 +244,7 @@ def issue_credentials():
         username = request.form.get('username')
         email = request.form.get('email')
         aadhar = request.form.get('aadhar')
-        dob = request.form.get('dob')
+        # dob = request.form.get('dob')
 
         # Process the data as needed
         # For example, you can store it in a database or perform any other actions
@@ -253,16 +254,16 @@ def issue_credentials():
         print(f"Username: {username}")
         print(f"Email: {email}")
         print(f"Aadhar Number: {aadhar}")
-        print(f"Date of Birth: {dob}")
+        # print(f"Date of Birth: {dob}")
         creds = {
             'username': username,
             'email': email,
             'aadhar': aadhar,
-            'dob': dob
+            # 'dob': dob
         }
 
         # You can return a response as needed
-        if org.issue_credentials(subjectTo=user_id, credentials=creds):
+        if org.issue_credentials(subjectTo=user_id, credentials=creds, uid=session['uid']):
             print("Credentials issued Successfully!")
         else:
             print("Credentials issued failed!")
@@ -279,6 +280,8 @@ def add_user():
         print(f"Added User ID: {user}")
         uid = session['uid']
         org.set_list(collection='ORG', field='userEmail', value=user, uid=uid)
+        # org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
+        #                                             field_name='users', new_value=_newValue)
         # You can return a response as needed
         print("User ID Added successfully!")
 
@@ -309,8 +312,16 @@ def join():
         _did = request.form.get('did')
         _email = request.form.get('email')
         _ip_address = request.remote_addr
+        _newValue = {
+            _email : {
+                'IP': _ip_address,
+                'did': _did
+            }
+        }
+        # res1 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
+        #                                                    field_name='users', new_value={_ip_address: _did})
         res1 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
-                                                           field_name='users', new_value={_ip_address: _did})
+                                                           field_name='users', new_value=_newValue)
         res2 = org.firebaseHandler.set_value_to_list_field(collection_name='ORG', document_id=_organization,
                                                            field_name='userEmail', new_value=_email)
         return render_template('join.html', emails=emails, result=(res1 and res2))
