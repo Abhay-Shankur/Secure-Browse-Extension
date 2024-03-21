@@ -199,8 +199,10 @@ def index():
         list_emails = org.get_list(collection='ORG', field='userEmail', uid=session['uid'])
         if list_emails is None:
             list_emails = list()
+        didDoc = org.get_list(collection='ORG', field='didDoc', uid=session['uid'])
+        print(f"DID: {didDoc}")
     # return render_template('index.html', collections=collections)
-    return render_template('dashboard.html', users=list_users, urls=list_urls, emails=list_emails)
+    return render_template('dashboard.html', users=list_users, urls=list_urls, emails=list_emails, did=didDoc)
 
 
 @app.route('/login', methods=['GET', 'POST'])
