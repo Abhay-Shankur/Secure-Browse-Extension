@@ -80,7 +80,7 @@ def generate_qr_code_content():
 
     # JSON content for the QR code
     content_dict = {
-        "type": ["VerifiableCredential", "OptiSecure"],
+        "type": ["VerifiableCredential", "CredentialsSchema"],
         "token": dynamic_data,
         "next_url": getattr(app, 'next_url', ''),
     }
